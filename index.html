@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تَعَارُف وَالضَّمَائِر — MPI Bahasa Arab</title>
+<style>
+  :root{
+    --font-scale: 1.0;
+    --hijau: #1f7a3d;
+    --hijau-tua: #0d4d24;
+    --hijau-muda: #4caf6f;
+    --kuning: #f5b400;
+    --kuning-tua: #c98a00;
+    --krem: #fffdf6;
+    --teks: #133019;
+    --ungu-a: #7c3aed;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    width:100%; height:100%;
+    overflow:hidden;
+    font-family:'Trebuchet MS','Segoe UI',sans-serif;
+    color:var(--teks);
+  }
+  body{
+    background: url('IMG-20260830-WA0028.jpg') center/cover no-repeat fixed, #f0f9ff;
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background: rgba(240,249,255,0.82);
+    z-index:0;
+  }
+  #app-wrap{
+    position:relative; z-index:1;
+    width: 100vw; height: 100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding: 1.2vh 1.2vw;
+  }
+  #stage-16-9{
+    background: transparent;
+    border:none; box-shadow:none; border-radius:0;
+    aspect-ratio: 16/9;
+    width: min(100%, 177.7vh);
+    height: min(100%, 56.25vw);
+    overflow:hidden;
+    position:relative;
+    font-size: calc(15px * var(--font-scale, 1.0));
+    display:flex; flex-direction:column;
+  }
+  .page{
+    position:absolute; inset:0;
+    display:none; flex-direction:column;
+    padding: clamp(10px, 1.8vh, 18px);
+    overflow:hidden;
+  }
+  .page.active{ display:flex; }
+
+  /* ===== Reusable bits ===== */
+  .topnav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 clamp(6px,0.8vh,10px) clamp(8px,1.2vh,12px);
+    flex-shrink:0;
+  }
+  .topnav-left, .topnav-right{ display:flex; align-items:center; gap: clamp(6px,0.8vw,12px); }
+  .nav-btn{
+    display:flex; align-items:center; justify-content:center;
+    width: clamp(40px,5.2vh,48px); height: clamp(40px,5.2vh,48px);
+    border-radius:50%;
+    background: linear-gradient(160deg,var(--hijau-muda),var(--hijau));
+    color:#fff; font-size: clamp(18px,2.3vh,23px);
+    border:none; cursor:pointer; box-shadow: 0 3px 8px rgba(13,77,36,.35);
+    transition: transform .15s ease;
+  }
+  .nav-btn:active{ transform: scale(.9); }
+  .home-pill{
+    display:flex; align-items:center; gap:8px;
+    background: linear-gradient(160deg,var(--hijau-muda),var(--hijau));
+    color:#fff; border:none; border-radius:999px;
+    padding: 8px 18px; font-weight:800; cursor:pointer;
+    font-size: clamp(12px,1.6vh,15px);
+    box-shadow: 0 3px 8px rgba(13,77,36,.3);
+  }
+  .zoom-ctrl{
+    display:flex; align-items:center; gap:6px;
+    background:#fff; border-radius:999px; padding:4px 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.12);
+  }
+  .zoom-ctrl button{
+    width:26px; height:26px; border-radius:50%; border:none;
+    background:var(--kuning); font-weight:900; cursor:pointer;
+    font-size:14px;
+  }
+  .title-bar{
+    background: linear-gradient(90deg,var(--hijau-tua),var(--hijau));
+    color:#fff; font-weight:800;
+    font-size: clamp(16px,2.2vh,22px);
+    padding: 7px 22px; border-radius:999px;
+    box-shadow: 0 3px 10px rgba(13,77,36,.28);
+  }
+
+  /* ===== Page 1: Cover ===== */
+  #page-cover{ justify-content:space-between; align-items:center; text-align:center; }
+  .cover-header{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    background:#fff; border-radius:999px;
+    padding: 6px 26px 6px 10px;
+    box-shadow: 0 4px 14px rgba(13,77,36,.25);
+    flex-shrink:0;
+  }
+  .cover-header img{
+    height: clamp(50px,6.8vh,68px); border-radius:50%;
+    box-shadow:0 2px 6px rgba(0,0,0,.2);
+  }
+  .cover-header .sch-text{ text-align:left; }
+  .cover-header .sch-name{ font-weight:900; color:var(--hijau-tua); font-size: clamp(13px,1.7vh,17px); }
+  .cover-header .sch-badge{ font-size: clamp(10px,1.2vh,12px); color:var(--kuning-tua); font-weight:700; }
+  .cover-mid{ display:flex; flex-direction:column; align-items:center; gap: clamp(8px,1.4vh,16px); }
+  .cover-mapel{
+    font-size: clamp(1rem,2.1vw,1.5rem); font-weight:800; letter-spacing:1px;
+    color:var(--hijau-tua); background:rgba(255,255,255,.75);
+    padding:4px 20px; border-radius:999px;
+  }
+  .cover-title{
+    font-size: clamp(2.8rem, 6.8vw, 5.2rem);
+    font-weight:900; color:var(--hijau-tua); line-height:1.05;
+    text-shadow:
+      -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 3px 3px 0 #fff,
+      0 8px 18px rgba(13,77,36,.35);
+  }
+  .cover-title .arab{ display:block; font-size: 0.55em; color:var(--kuning-tua); margin-top:4px; }
+  .cover-sub{
+    font-size: clamp(1.4rem, 3.2vw, 2.6rem); font-weight:800; color:#0d4d24;
+    background: rgba(255,255,255,.7); padding: 2px 24px; border-radius:14px;
+  }
+  .play-btn{
+    width: clamp(60px,8.5vh,80px); height: clamp(60px,8.5vh,80px);
+    border-radius:50%; border:none; cursor:pointer;
+    background: radial-gradient(circle at 35% 30%, var(--kuning), var(--kuning-tua));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 0 0 0 rgba(245,180,0,.7);
+    animation: pulseGlow 1.8s infinite;
+  }
+  .play-btn .tri{
+    width:0; height:0;
+    border-top: clamp(13px,1.8vh,18px) solid transparent;
+    border-bottom: clamp(13px,1.8vh,18px) solid transparent;
+    border-left: clamp(22px,3vh,30px) solid #0d4d24;
+    margin-left:6px;
+  }
+  @keyframes pulseGlow{
+    0%{ box-shadow: 0 0 0 0 rgba(245,180,0,.6);}
+    70%{ box-shadow: 0 0 0 22px rgba(245,180,0,0);}
+    100%{ box-shadow: 0 0 0 0 rgba(245,180,0,0);}
+  }
+  .play-label{ font-weight:900; color:var(--hijau-tua); font-size: clamp(24px,3.8vh,36px); margin-top:6px;}
+  .cover-footer{
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    background: rgba(255,255,255,.72); border-radius:14px; padding:6px 22px;
+    flex-shrink:0;
+  }
+  .cover-footer .guru{ font-weight:800; font-size: clamp(12px,1.5vh,14px); color:var(--hijau-tua);}
+  .cover-footer .semboyan{ font-size: clamp(10px,1.2vh,12px); color:var(--kuning-tua); font-style:italic; font-weight:700;}
+
+  /* ===== Page 2: Dashboard ===== */
+  #page-dashboard .menu-grid{
+    flex:1; display:grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(2,1fr);
+    gap: clamp(10px,1.4vh,16px); overflow:hidden;
+  }
+  .menu-card{
+    background: rgba(255,255,255,.9);
+    border-radius:18px; padding: clamp(8px,1.2vh,14px);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:6px;
+    cursor:pointer; border: 2px solid rgba(31,122,61,.15);
+    box-shadow: 0 5px 14px rgba(13,77,36,.15);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .menu-card:active{ transform: translateY(2px) scale(.98); }
+  .icon-box{
+    width: clamp(66px,9vh,88px); height: clamp(66px,9vh,88px);
+    border-radius:22px;
+    display:flex; align-items:center; justify-content:center;
+    font-size: clamp(34px,4.8vh,46px);
+    background: linear-gradient(155deg,var(--hijau-muda),var(--hijau-tua));
+    box-shadow: 0 4px 10px rgba(13,77,36,.3);
+    flex-shrink:0;
+  }
+  .menu-card h3{ font-size: clamp(15px,2vh,20px); font-weight:800; color:var(--hijau-tua); }
+  .menu-card p{ font-size: clamp(10px,1.25vh,12.5px); font-weight:600; color:#33513c; line-height:1.3; }
+
+  /* ===== Page 3: Tujuan ===== */
+  #page-tujuan{ align-items:center; justify-content:center; }
+  .tp-card{
+    background: rgba(255,255,255,.93); border-radius:24px;
+    padding: clamp(16px,2.6vh,30px) clamp(22px,3.4vw,44px);
+    width:92%; max-height:100%; overflow:hidden;
+    box-shadow: 0 8px 22px rgba(13,77,36,.2);
+    display:flex; flex-direction:column; gap: clamp(8px,1.3vh,14px);
+  }
+  .tp-card h2{ color:var(--hijau-tua); font-size: clamp(18px,2.6vh,26px); text-align:center; font-weight:900;}
+  .tp-card .arab-h{ text-align:center; color:var(--kuning-tua); font-size: clamp(14px,1.9vh,18px); font-weight:800;}
+  .tp-list{ list-style:none; display:flex; flex-direction:column; gap: clamp(6px,1vh,10px); }
+  .tp-list li{
+    display:flex; align-items:flex-start; gap:10px;
+    background: linear-gradient(90deg, rgba(76,175,111,.12), transparent);
+    border-left: 5px solid var(--hijau); border-radius:8px;
+    padding: clamp(6px,1vh,10px) clamp(8px,1.2vw,14px);
+    font-size: clamp(13.5px,1.65vh,16px); font-weight:600; line-height:1.45;
+  }
+  .tp-list li .bullet-ico{ font-size: clamp(16px,2vh,20px); flex-shrink:0; }
+
+  /* ===== Page 4: Materi ===== */
+  #page-materi .materi-grid{
+    flex:1; display:grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(2,1fr);
+    gap: clamp(8px,1.2vh,14px); overflow:hidden;
+  }
+  .materi-card{
+    background: rgba(255,255,255,.92); border-radius:16px; overflow:hidden;
+    display:flex; flex-direction:column; box-shadow: 0 4px 12px rgba(13,77,36,.15);
+    border:2px solid rgba(31,122,61,.12);
+  }
+  .materi-visual{
+    height:42%; display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(155deg,#eafaf0,#d7f3e0);
+    font-size: clamp(30px,4vh,42px);
+  }
+  .materi-body{ padding: clamp(6px,0.9vh,10px) clamp(8px,1vw,12px); flex:1; overflow:hidden; display:flex; flex-direction:column; gap:3px;}
+  .materi-body h4{ font-size: clamp(13px,1.7vh,17px); color:var(--hijau-tua); font-weight:800; }
+  .materi-body .arab-mini{ font-size: clamp(13px,1.7vh,16px); color:var(--kuning-tua); font-weight:800; }
+  .materi-body p{ font-size: clamp(11px,1.4vh,13px); font-weight:600; line-height:1.35; color:#2b4634; }
+
+  /* ===== Page 5: Simulasi ===== */
+  #page-simulasi{ gap: clamp(6px,1vh,10px); }
+  .sim-wrap{ flex:1; display:flex; gap: clamp(10px,1.4vw,16px); overflow:hidden; }
+  .sim-svg-box{
+    flex:1.4; background: rgba(255,255,255,.9); border-radius:18px;
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+    box-shadow: 0 5px 14px rgba(13,77,36,.15);
+    padding: clamp(6px,1vh,10px);
+  }
+  .sim-svg-box svg{ height: clamp(260px,38vh,420px); width:100%; }
+  .sim-panel{
+    flex:1; display:flex; flex-direction:column; gap: clamp(6px,1vh,10px);
+    background: rgba(255,255,255,.9); border-radius:18px; padding: clamp(8px,1.3vh,14px);
+    box-shadow: 0 5px 14px rgba(13,77,36,.15); overflow:hidden;
+  }
+  .sim-panel h3{ font-size: clamp(14px,1.9vh,18px); color:var(--hijau-tua); font-weight:800; text-align:center;}
+  .sim-status{
+    background: linear-gradient(90deg,#eafaf0,#d7f3e0); border-radius:12px;
+    padding: clamp(8px,1.3vh,14px); text-align:center; flex:1;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+  }
+  .sim-status .sym{ font-size: clamp(26px,4vh,40px); font-weight:900; color:var(--hijau-tua);}
+  .sim-status .arti{ font-size: clamp(13px,1.7vh,17px); font-weight:800; color:var(--kuning-tua);}
+  .sim-status .contoh{ font-size: clamp(11px,1.4vh,13px); font-weight:600; color:#2b4634;}
+  .sim-btn-row{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .dham-btn{
+    border:none; border-radius:12px; padding: clamp(6px,1vh,9px) clamp(8px,1.2vw,12px);
+    background: linear-gradient(160deg,var(--hijau-muda),var(--hijau));
+    color:#fff; font-weight:800; cursor:pointer; font-size: clamp(13.5px,1.8vh,17px);
+    box-shadow: 0 3px 8px rgba(13,77,36,.25);
+  }
+  .dham-btn.active-btn{ background: linear-gradient(160deg,var(--kuning),var(--kuning-tua)); color:#4a3300; }
+
+  /* ===== Page 6: Evaluasi ===== */
+  #page-evaluasi{ gap: clamp(6px,1vh,10px); }
+  .eval-tabs{ display:flex; gap:8px; justify-content:center; flex-shrink:0; }
+  .eval-tab{
+    padding: 5px 16px; border-radius:999px; font-weight:800; font-size: clamp(11px,1.4vh,13px);
+    background:#e2f3e6; color:var(--hijau-tua); border:2px solid transparent;
+  }
+  .eval-tab.on{ background: linear-gradient(90deg,var(--hijau-tua),var(--hijau)); color:#fff; }
+  .eval-body{ flex:1; overflow:hidden; display:flex; flex-direction:column; }
+  .eval-round{ display:none; flex:1; flex-direction:column; gap: clamp(8px,1.2vh,12px); overflow:hidden; }
+  .eval-round.active{ display:flex; }
+  .q-card{
+    background: rgba(255,255,255,.92); border-radius:16px;
+    padding: clamp(8px,1.3vh,14px) clamp(10px,1.5vw,18px);
+    box-shadow: 0 4px 12px rgba(13,77,36,.15);
+  }
+  .q-card .q-text{ font-size: clamp(14px,1.85vh,18px); font-weight:800; color:var(--hijau-tua); margin-bottom:6px;}
+  .q-options{ display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
+  .q-opt{
+    border:2px solid #cdeed8; border-radius:12px; background:#fff;
+    padding: 10px 22px; font-size: clamp(13.5px,1.8vh,17px); font-weight:700; cursor:pointer;
+    text-align:center;
+  }
+  .q-opt.correct{ background:#d5f5df; border-color:var(--hijau); }
+  .q-opt.wrong{ background:#fbd8d8; border-color:#d84848; }
+  .tf-row{ display:flex; gap:14px; justify-content:center; margin-top:6px; }
+  .tf-btn{
+    border:none; border-radius:12px; padding:10px 30px; font-weight:900; cursor:pointer;
+    font-size: clamp(13.5px,1.8vh,17px); color:#fff;
+  }
+  .tf-btn.benar{ background: linear-gradient(160deg,#4caf6f,#1f7a3d); }
+  .tf-btn.salah{ background: linear-gradient(160deg,#e57373,#b23a3a); }
+  .match-wrap{ flex:1; display:flex; gap: 4%; position:relative; overflow:hidden; }
+  .match-col{ flex:1; display:flex; flex-direction:column; gap: clamp(6px,1vh,10px); justify-content:center; }
+  .match-item{
+    background:#fff; border:2px solid #cdeed8; border-radius:12px;
+    padding: clamp(8px,1.2vh,12px); font-weight:800; font-size: clamp(13px,1.7vh,16px);
+    text-align:center; cursor:pointer;
+  }
+  .match-item.sel{ border-color: var(--kuning-tua); background:#fff6df; }
+  .match-item.done{ opacity:.55; cursor:default; }
+  #match-svg{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  .score-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: clamp(6px,1vh,10px); }
+  .trophy{ font-size: clamp(44px,6vh,60px); filter: drop-shadow(0 4px 8px rgba(0,0,0,.25)); animation: bounceTrophy 1.4s ease-in-out infinite;}
+  @keyframes bounceTrophy{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+  .score-num{ font-size: clamp(2rem,4.6vw,3.2rem); font-weight:900; color:var(--hijau-tua);}
+  .score-detail{ display:flex; gap:14px; font-size: clamp(12px,1.5vh,14px); font-weight:700; color:#2b4634;}
+  .reset-btn{
+    border:none; border-radius:999px; padding:8px 26px; font-weight:800; cursor:pointer;
+    background: linear-gradient(160deg,var(--kuning),var(--kuning-tua)); color:#4a3300;
+    font-size: clamp(12px,1.5vh,14px);
+  }
+  .eval-nav{ display:flex; justify-content:space-between; flex-shrink:0; }
+  .eval-nav button{
+    border:none; border-radius:999px; padding:7px 20px; font-weight:800; cursor:pointer;
+    background: linear-gradient(160deg,var(--hijau-muda),var(--hijau)); color:#fff;
+    font-size: clamp(12px,1.5vh,14px);
+  }
+  .eval-nav button:disabled{ opacity:.4; cursor:not-allowed; }
+
+  /* ===== Page 7: Profil ===== */
+  #page-profil{ align-items:center; justify-content:center; }
+  .profil-card{
+    background: rgba(255,255,255,.93); border-radius:24px;
+    padding: clamp(16px,2.6vh,28px) clamp(24px,3.4vw,46px);
+    display:flex; align-items:center; gap: clamp(18px,3vw,36px);
+    box-shadow: 0 8px 22px rgba(13,77,36,.2); max-width:92%;
+  }
+  .profil-photo{
+    width: clamp(130px,18vh,175px); height: clamp(130px,18vh,175px);
+    border-radius:50%; object-fit:cover;
+    border: 5px solid; border-image: linear-gradient(160deg,var(--kuning),var(--hijau)) 1;
+    box-shadow: 0 8px 18px rgba(13,77,36,.35);
+    flex-shrink:0;
+  }
+  .profil-text{ display:flex; flex-direction:column; gap: clamp(4px,0.8vh,8px); }
+  .profil-text .nama{ font-size: clamp(20px,2.6vh,24px); font-weight:900; color:var(--hijau-tua); }
+  .profil-text .jabatan{ font-size: clamp(13px,1.6vh,15px); font-weight:700; color:var(--kuning-tua); }
+  .profil-text .sekolah{ font-size: clamp(13px,1.6vh,15px); font-weight:600; color:#33513c;}
+  .profil-text .kutipan{
+    margin-top:6px; font-style:italic; font-weight:700; color:#2b4634;
+    font-size: clamp(12px,1.5vh,14px); border-left:4px solid var(--hijau); padding-left:10px;
+  }
+
+  /* ===== Modal Wawasan ===== */
+  .modal-overlay{
+    position:absolute; inset:0; background:rgba(13,40,22,.55);
+    display:none; align-items:center; justify-content:center; z-index:50;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{
+    background:#fffdf6; border-radius:20px; padding: clamp(16px,2.4vh,26px) clamp(18px,2.6vw,30px);
+    width:min(80%, 560px); box-shadow:0 12px 30px rgba(0,0,0,.35);
+    display:flex; flex-direction:column; gap:10px; position:relative;
+  }
+  .modal-box h3{ color:var(--hijau-tua); font-size: clamp(16px,2vh,20px); }
+  .modal-box p{ font-size: clamp(12.5px,1.55vh,14.5px); font-weight:600; line-height:1.5; color:#2b4634;}
+  .modal-close{
+    position:absolute; top:8px; right:10px; border:none; background:#e2f3e6; color:var(--hijau-tua);
+    width:30px; height:30px; border-radius:50%; font-weight:900; cursor:pointer;
+  }
+  .modal-next{
+    align-self:flex-end; border:none; border-radius:999px; padding:6px 18px; font-weight:800;
+    background: linear-gradient(160deg,var(--hijau-muda),var(--hijau)); color:#fff; cursor:pointer;
+    font-size: clamp(11px,1.4vh,13px);
+  }
+</style>
+</head>
+<body>
+<div id="app-wrap">
+<div id="stage-16-9">
+
+  <!-- ============ PAGE 1: COVER ============ -->
+  <section class="page active" id="page-cover">
+    <div class="cover-header">
+      <img src="IMG-20260721-WA0058.jpg" alt="Logo Sekolah" onerror="this.style.display='none'">
+      <div class="sch-text">
+        <div class="sch-name" id="sch-name-cover">SMP Ma'arif 3 Sekaran</div>
+        <div class="sch-badge">Kurikulum Merdeka • Fase D</div>
+      </div>
+    </div>
+    <div class="cover-mid">
+      <div class="cover-mapel" id="mapel-cover">Bahasa Arab</div>
+      <div class="cover-title">Perkenalan &amp; Isim Dhamir
+        <span class="arab">تَعَارُف وَالضَّمَائِر</span>
+      </div>
+      <div class="cover-sub">Media Pembelajaran Interaktif — Fase D Kelas VII</div>
+      <div>
+        <button class="play-btn" onclick="goPage('dashboard'); sfxClick();" aria-label="Mulai">
+          <div class="tri"></div>
+        </button>
+        <div class="play-label">▶ MULAI</div>
+      </div>
+    </div>
+    <div class="cover-footer">
+      <div class="guru">Disusun oleh: Venia Nuzulul 'Adila, M.Pd. — SMP Ma'arif 3 Sekaran</div>
+      <div class="semboyan">"Berilmu, Berakhlak, Siap Berprestasi"</div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 2: DASHBOARD ============ -->
+  <section class="page" id="page-dashboard">
+    <div class="topnav">
+      <div class="topnav-left">
+        <button class="home-pill" onclick="goPage('cover'); sfxClick();">🏠 BERANDA</button>
+      </div>
+      <div class="title-bar">Menu Utama</div>
+      <div class="topnav-right">
+        <div class="zoom-ctrl">
+          <button onclick="changeFont(-1)">A-</button>
+          <button onclick="changeFont(1)">A+</button>
+        </div>
+        <button class="nav-btn" id="sound-toggle" onclick="toggleSound()" title="Suara">🔊</button>
+      </div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-card" onclick="goPage('tujuan'); sfxClick();">
+        <div class="icon-box">🎯</div>
+        <h3>Tujuan Pembelajaran</h3>
+        <p>Capaian &amp; indikator kompetensi siswa</p>
+      </div>
+      <div class="menu-card" onclick="goPage('materi'); sfxClick();">
+        <div class="icon-box">📖</div>
+        <h3>Materi Pembelajaran</h3>
+        <p>Eksplorasi kosakata &amp; isim dhamir</p>
+      </div>
+      <div class="menu-card" onclick="goPage('simulasi'); sfxClick();">
+        <div class="icon-box">🕹️</div>
+        <h3>Simulasi Interaktif</h3>
+        <p>Latihan dhamir dengan papan interaktif</p>
+      </div>
+      <div class="menu-card" onclick="goPage('evaluasi'); sfxClick();">
+        <div class="icon-box">📝</div>
+        <h3>Evaluasi Multi-Format</h3>
+        <p>3 jenis uji pemahaman, 100 poin</p>
+      </div>
+      <div class="menu-card" onclick="goPage('profil'); sfxClick();">
+        <div class="icon-box">👨‍🏫</div>
+        <h3>Profil Guru</h3>
+        <p>Fasilitator pembelajaran Bahasa Arab</p>
+      </div>
+      <div class="menu-card" onclick="openWawasan(); sfxClick();">
+        <div class="icon-box">💡</div>
+        <h3>Wawasan &amp; Fakta</h3>
+        <p>Fakta menarik seputar Bahasa Arab</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 3: TUJUAN ============ -->
+  <section class="page" id="page-tujuan">
+    <div class="topnav">
+      <div class="topnav-left"><button class="nav-btn" onclick="goPage('dashboard'); sfxClick();">⬅️</button></div>
+      <div class="title-bar">Tujuan Pembelajaran</div>
+      <div class="topnav-right"><button class="home-pill" onclick="goPage('cover'); sfxClick();">🏠 BERANDA</button></div>
+    </div>
+    <div class="tp-card">
+      <h2>Tujuan Pembelajaran</h2>
+      <div class="arab-h">أَهْدَافُ التَّعَلُّمِ</div>
+      <ul class="tp-list">
+        <li><span class="bullet-ico">🕌</span> Peserta didik mampu melafalkan dan menggunakan ungkapan sapaan serta perkenalan diri (تَعَارُف) dalam Bahasa Arab dengan pelafalan yang tepat.</li>
+        <li><span class="bullet-ico">👤</span> Peserta didik mampu mengidentifikasi dan membedakan isim dhamir (kata ganti orang) munfashil: أَنَا، أَنْتَ، أَنْتِ، هُوَ، هِيَ، نَحْنُ beserta artinya.</li>
+        <li><span class="bullet-ico">💬</span> Peserta didik mampu menyusun dan mempraktikkan dialog sederhana perkenalan diri menggunakan pola اِسْمِي... / مَا اسْمُكَ؟ dengan dhamir yang sesuai.</li>
+        <li><span class="bullet-ico">✍️</span> Peserta didik mampu menerapkan kosakata perkenalan dan isim dhamir dalam konteks komunikasi lisan maupun tulisan sehari-hari.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 4: MATERI ============ -->
+  <section class="page" id="page-materi">
+    <div class="topnav">
+      <div class="topnav-left"><button class="nav-btn" onclick="goPage('dashboard'); sfxClick();">⬅️</button></div>
+      <div class="title-bar">Materi Pembelajaran</div>
+      <div class="topnav-right"><button class="home-pill" onclick="goPage('cover'); sfxClick();">🏠 BERANDA</button></div>
+    </div>
+    <div class="materi-grid">
+      <div class="materi-card">
+        <div class="materi-visual">🤝</div>
+        <div class="materi-body">
+          <h4>Ungkapan Salam</h4>
+          <div class="arab-mini">السَّلَامُ عَلَيْكُمْ</div>
+          <p>Sapaan pembuka: السلام عليكم، صباح الخير، مساء الخير digunakan sebelum memulai perkenalan.</p>
+        </div>
+      </div>
+      <div class="materi-card">
+        <div class="materi-visual">🙋</div>
+        <div class="materi-body">
+          <h4>Pola Perkenalan Diri</h4>
+          <div class="arab-mini">اِسْمِي...</div>
+          <p>Pola dasar: اِسْمِي (namaku) diikuti nama diri. Contoh: اِسْمِي أَحْمَدُ.</p>
+        </div>
+      </div>
+      <div class="materi-card">
+        <div class="materi-visual">❓</div>
+        <div class="materi-body">
+          <h4>Pertanyaan Identitas</h4>
+          <div class="arab-mini">مَا اسْمُكَ؟</div>
+          <p>مَا اسْمُكَ؟ (siapa namamu, lk), مَا اسْمُكِ؟ (pr), dan مِنْ أَيْنَ أَنْتَ؟ (dari mana kamu).</p>
+        </div>
+      </div>
+      <div class="materi-card">
+        <div class="materi-visual">👥</div>
+        <div class="materi-body">
+          <h4>Isim Dhamir Munfashil</h4>
+          <div class="arab-mini">أَنَا، أَنْتَ، هُوَ...</div>
+          <p>Kata ganti orang berdiri sendiri yang menunjukkan pelaku: أنا، أنتَ، أنتِ، هو، هي، نحن.</p>
+        </div>
+      </div>
+      <div class="materi-card">
+        <div class="materi-visual">🧑‍🤝‍🧑</div>
+        <div class="materi-body">
+          <h4>Dhamir Tunggal &amp; Jamak</h4>
+          <div class="arab-mini">نَحْنُ</div>
+          <p>أنا untuk satu orang (saya), نحن untuk banyak orang (kami/kita) — bentuk jamak mutakallim.</p>
+        </div>
+      </div>
+      <div class="materi-card">
+        <div class="materi-visual">🗣️</div>
+        <div class="materi-body">
+          <h4>Dialog Contoh</h4>
+          <div class="arab-mini">تَعَارُف</div>
+          <p>أ: السلام عليكم، اسمي عادلة. ب: وعليكم السلام، أنا أحمد. تطبيق nyata pola perkenalan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 5: SIMULASI ============ -->
+  <section class="page" id="page-simulasi">
+    <div class="topnav">
+      <div class="topnav-left"><button class="nav-btn" onclick="goPage('dashboard'); sfxClick();">⬅️</button></div>
+      <div class="title-bar">Simulasi: Papan Isim Dhamir</div>
+      <div class="topnav-right"><button class="home-pill" onclick="goPage('cover'); sfxClick();">🏠 BERANDA</button></div>
+    </div>
+    <div class="sim-wrap">
+      <div class="sim-svg-box">
+        <svg id="dhamir-svg" viewBox="0 0 640 400" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="sim-panel">
+        <h3>Klik dhamir untuk melihat artinya</h3>
+        <div class="sim-status" id="sim-status">
+          <div class="sym" id="sim-sym">👋</div>
+          <div class="arti" id="sim-arti">Silakan pilih salah satu dhamir</div>
+          <div class="contoh" id="sim-contoh">Papan interaktif akan menyorot pilihanmu</div>
+        </div>
+        <div class="sim-btn-row" id="sim-btns"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 6: EVALUASI ============ -->
+  <section class="page" id="page-evaluasi">
+    <div class="topnav">
+      <div class="topnav-left"><button class="nav-btn" onclick="goPage('dashboard'); sfxClick();">⬅️</button></div>
+      <div class="title-bar">Evaluasi Multi-Format</div>
+      <div class="topnav-right"><button class="home-pill" onclick="goPage('cover'); sfxClick();">🏠 BERANDA</button></div>
+    </div>
+    <div class="eval-tabs">
+      <div class="eval-tab" id="tab-A">A · Pilihan Ganda (30)</div>
+      <div class="eval-tab" id="tab-B">B · Menjodohkan (40)</div>
+      <div class="eval-tab" id="tab-C">C · Benar/Salah (30)</div>
+      <div class="eval-tab" id="tab-D">D · Rekap Skor</div>
+    </div>
+    <div class="eval-body">
+      <!-- Babak A -->
+      <div class="eval-round" id="round-A"></div>
+      <!-- Babak B -->
+      <div class="eval-round" id="round-B">
+        <div class="q-card" style="text-align:center;">Klik satu dhamir di kolom kiri, lalu klik artinya di kolom kanan untuk memasangkan.</div>
+        <div class="match-wrap">
+          <svg id="match-svg"></svg>
+          <div class="match-col" id="match-left"></div>
+          <div class="match-col" id="match-right"></div>
+        </div>
+      </div>
+      <!-- Babak C -->
+      <div class="eval-round" id="round-C"></div>
+      <!-- Babak D -->
+      <div class="eval-round" id="round-D">
+        <div class="score-wrap">
+          <div class="trophy">🏆</div>
+          <div class="score-num" id="final-score">0</div>
+          <div class="score-detail">
+            <span>Babak A: <b id="score-a">0</b>/30</span>
+            <span>Babak B: <b id="score-b">0</b>/40</span>
+            <span>Babak C: <b id="score-c">0</b>/30</span>
+          </div>
+          <button class="reset-btn" onclick="resetEval()">🔄 Ulangi Evaluasi</button>
+        </div>
+      </div>
+    </div>
+    <div class="eval-nav">
+      <button id="btn-prev-round" onclick="shiftRound(-1)">⬅️ Sebelumnya</button>
+      <button id="btn-next-round" onclick="shiftRound(1)">Berikutnya ➡️</button>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 7: PROFIL GURU ============ -->
+  <section class="page" id="page-profil">
+    <div class="topnav">
+      <div class="topnav-left"><button class="nav-btn" onclick="goPage('dashboard'); sfxClick();">⬅️</button></div>
+      <div class="title-bar">Profil Guru</div>
+      <div class="topnav-right"><button class="home-pill" onclick="goPage('cover'); sfxClick();">🏠 BERANDA</button></div>
+    </div>
+    <div class="profil-card">
+      <img class="profil-photo" src="IMG-20250913-WA0000.jpg" alt="Foto Guru" onerror="this.style.display='none'">
+      <div class="profil-text">
+        <div class="nama">Venia Nuzulul 'Adila, M.Pd.</div>
+        <div class="jabatan">Guru Bahasa Arab</div>
+        <div class="sekolah">SMP Ma'arif 3 Sekaran — Manyar, Sekaran, Lamongan</div>
+        <div class="kutipan">"مَنْ جَدَّ وَجَدَ — Barang siapa bersungguh-sungguh, ia akan berhasil."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODAL WAWASAN ============ -->
+  <div class="modal-overlay" id="modal-wawasan">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeWawasan()">✕</button>
+      <h3 id="wawasan-title">💡 Tahukah Kamu?</h3>
+      <p id="wawasan-text"></p>
+      <button class="modal-next" onclick="nextWawasan()">Fakta Berikutnya ➡️</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const DHAMIR = [
+  {kode:'ana', arab:'أَنَا', arti:'Saya', contoh:'أَنَا طَالِبٌ — Saya seorang siswa', sym:'🙋'},
+  {kode:'anta', arab:'أَنْتَ', arti:'Kamu (laki-laki)', contoh:'أَنْتَ طَالِبٌ — Kamu seorang siswa', sym:'👦'},
+  {kode:'anti', arab:'أَنْتِ', arti:'Kamu (perempuan)', contoh:'أَنْتِ طَالِبَةٌ — Kamu seorang siswi', sym:'👧'},
+  {kode:'huwa', arab:'هُوَ', arti:'Dia (laki-laki)', contoh:'هُوَ مُدَرِّسٌ — Dia seorang guru (lk)', sym:'🧑'},
+  {kode:'hiya', arab:'هِيَ', arti:'Dia (perempuan)', contoh:'هِيَ مُدَرِّسَةٌ — Dia seorang guru (pr)', sym:'👩'},
+  {kode:'nahnu', arab:'نَحْنُ', arti:'Kami / Kita', contoh:'نَحْنُ طُلَّابٌ — Kami para siswa', sym:'👨‍👩‍👧‍👦'}
+];
+
+const WAWASAN = [
+  'Bahasa Arab ditulis dan dibaca dari kanan ke kiri, berbeda dengan Bahasa Indonesia.',
+  'Isim dhamir dalam Bahasa Arab membedakan jenis kelamin, sesuatu yang tidak ada pada kata ganti Bahasa Indonesia.',
+  'Ucapan السَّلَامُ عَلَيْكُمْ berarti "semoga keselamatan tercurah atasmu" dan digunakan sebagai salam universal umat Islam.',
+  'Kata اِسْمِي (namaku) berasal dari akar kata س م و yang berarti "nama" atau "ketinggian".',
+  'Bahasa Arab memiliki lebih dari 12 juta penutur asli dan menjadi bahasa resmi di lebih dari 20 negara.'
+];
+let wawasanIdx = 0;
+
+const QUIZ_A = [
+  { q:'Manakah dhamir yang berarti "Saya"?', arabQ:'أَيُّ الضَّمَائِرِ بِمَعْنَى "أنا"؟', opts:['أَنْتَ','أَنَا','هُوَ','نَحْنُ'], correct:1 },
+  { q:'Dhamir "أَنْتِ" digunakan untuk menyapa siapa?', arabQ:null, opts:['Laki-laki tunggal','Perempuan tunggal','Kelompok orang','Dia (laki-laki)'], correct:1 },
+  { q:'Ungkapan yang tepat untuk bertanya nama kepada laki-laki adalah...', arabQ:null, opts:['مَا اسْمُكِ؟','مِنْ أَيْنَ أَنْتَ؟','مَا اسْمُكَ؟','كَيْفَ حَالُكَ؟'], correct:2 }
+];
+let quizAAnswered = [null,null,null];
+
+const QUIZ_C = [
+  { s:'هُوَ digunakan untuk menunjuk kepada perempuan.', val:false },
+  { s:'نَحْنُ berarti "kami" atau "kita", menunjukkan lebih dari satu orang.', val:true },
+  { s:'اِسْمِي berarti "namamu", digunakan untuk bertanya kepada lawan bicara.', val:false }
+];
+let quizCAnswered = [null,null,null];
+
+let matchState = { leftSel:null, pairs:{}, doneCount:0 };
+const MATCH_PAIRS = [
+  {left:'أَنَا', right:'Saya'},
+  {left:'أَنْتَ', right:'Kamu (laki-laki)'},
+  {left:'هُوَ', right:'Dia (laki-laki)'},
+  {left:'هِيَ', right:'Dia (perempuan)'}
+];
+let matchLeftOrder = [], matchRightOrder = [];
+
+/* ============ NAV ============ */
+function goPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+}
+function changeFont(dir){
+  let cur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-scale')) || 1.0;
+  cur = Math.min(1.25, Math.max(0.8, cur + dir*0.08));
+  document.documentElement.style.setProperty('--font-scale', cur);
+}
+
+/* ============ AUDIO SYNTH ============ */
+let audioCtx = null;
+let soundOn = true;
+function ensureCtx(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
+function toggleSound(){
+  soundOn = !soundOn;
+  document.getElementById('sound-toggle').textContent = soundOn ? '🔊' : '🔇';
+}
+function tone(freqStart, freqEnd, dur, type, gainVal){
+  if(!soundOn) return;
+  try{
+    const ctx = ensureCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freqStart, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(freqEnd,1), ctx.currentTime + dur);
+    gain.gain.setValueAtTime(gainVal || 0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + dur);
+  }catch(e){}
+}
+function sfxClick(){ tone(450,880,0.12,'triangle',0.12); }
+function sfxCorrect(){
+  if(!soundOn) return;
+  [523.25,659.25,783.99].forEach((f,i)=>{
+    setTimeout(()=>tone(f,f,0.25,'sine',0.14), i*90);
+  });
+}
+function sfxWrong(){ tone(220,110,0.35,'sawtooth',0.13); }
+
+/* ============ MODAL WAWASAN ============ */
+function openWawasan(){
+  wawasanIdx = Math.floor(Math.random()*WAWASAN.length);
+  document.getElementById('wawasan-text').textContent = WAWASAN[wawasanIdx];
+  document.getElementById('modal-wawasan').classList.add('show');
+}
+function nextWawasan(){
+  sfxClick();
+  wawasanIdx = (wawasanIdx+1) % WAWASAN.length;
+  document.getElementById('wawasan-text').textContent = WAWASAN[wawasanIdx];
+}
+function closeWawasan(){ sfxClick(); document.getElementById('modal-wawasan').classList.remove('show'); }
+
+/* ============ SIMULASI: SVG PAPAN DHAMIR ============ */
+function buildDhamirSVG(){
+  const svg = document.getElementById('dhamir-svg');
+  const cols = 3, rows = 2;
+  const cellW = 640/cols, cellH = 400/rows;
+  let html = '';
+  DHAMIR.forEach((d,i)=>{
+    const cx = (i%cols)*cellW + cellW/2;
+    const cy = Math.floor(i/cols)*cellH + cellH/2;
+    html += `
+    <g class="dham-node" data-idx="${i}" style="cursor:pointer;" onclick="selectDhamir(${i})">
+      <circle cx="${cx}" cy="${cy-18}" r="15" fill="url(#gradNode${i%3})" stroke="#0d4d24" stroke-width="4">
+        <animate attributeName="r" values="15;17;15" dur="2.4s" repeatCount="indefinite" begin="${i*0.2}s"/>
+      </circle>
+      <text x="${cx}" y="${cy-13}" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">${i+1}</text>
+      <rect x="${cx-46}" y="${cy+4}" width="92" height="26" rx="6" fill="white" stroke="#1f7a3d" stroke-width="1.5"/>
+      <text x="${cx}" y="${cy+22}" text-anchor="middle" font-size="15" font-weight="800" fill="#0d4d24">${d.arab}</text>
+      <line x1="${cx}" y1="${cy-3}" x2="${cx}" y2="${cy+4}" stroke="#1f7a3d" stroke-width="4" stroke-dasharray="4 3">
+        <animate attributeName="stroke-dashoffset" values="0;-14" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+    </g>`;
+  });
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="gradNode0" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#4caf6f"/><stop offset="100%" stop-color="#0d4d24"/>
+      </linearGradient>
+      <linearGradient id="gradNode1" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#f5b400"/><stop offset="100%" stop-color="#c98a00"/>
+      </linearGradient>
+      <linearGradient id="gradNode2" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#4c1d95"/>
+      </linearGradient>
+    </defs>
+    ${html}`;
+
+  const btnRow = document.getElementById('sim-btns');
+  btnRow.innerHTML = '';
+  DHAMIR.forEach((d,i)=>{
+    const b = document.createElement('button');
+    b.className = 'dham-btn';
+    b.id = 'dbtn-'+i;
+    b.textContent = d.arab;
+    b.onclick = ()=>selectDhamir(i);
+    btnRow.appendChild(b);
+  });
+}
+function selectDhamir(i){
+  sfxClick();
+  const d = DHAMIR[i];
+  document.getElementById('sim-sym').textContent = d.sym;
+  document.getElementById('sim-arti').textContent = d.arab + '  —  ' + d.arti;
+  document.getElementById('sim-contoh').textContent = d.contoh;
+  document.querySelectorAll('.dham-btn').forEach(b=>b.classList.remove('active-btn'));
+  document.getElementById('dbtn-'+i).classList.add('active-btn');
+}
+
+/* ============ EVALUASI: BABAK A ============ */
+function buildRoundA(){
+  const el = document.getElementById('round-A');
+  el.innerHTML = '';
+  QUIZ_A.forEach((item,qi)=>{
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.innerHTML = `<div class="q-text">${qi+1}. ${item.q}</div>
+      <div class="q-options" id="qopts-${qi}"></div>`;
+    el.appendChild(card);
+    const optsBox = card.querySelector('#qopts-'+qi);
+    item.opts.forEach((opt,oi)=>{
+      const b = document.createElement('button');
+      b.className = 'q-opt';
+      b.textContent = opt;
+      b.onclick = ()=>answerA(qi,oi,b);
+      optsBox.appendChild(b);
+    });
+  });
+}
+function answerA(qi,oi,btn){
+  if(quizAAnswered[qi] !== null) return;
+  sfxClick();
+  quizAAnswered[qi] = oi;
+  const correct = QUIZ_A[qi].correct;
+  const opts = btn.parentElement.querySelectorAll('.q-opt');
+  opts[correct].classList.add('correct');
+  if(oi !== correct){ btn.classList.add('wrong'); sfxWrong(); } else { sfxCorrect(); }
+}
+
+/* ============ EVALUASI: BABAK B (MATCHING) ============ */
+function buildRoundB(){
+  matchState = { leftSel:null, pairs:{}, doneCount:0 };
+  matchLeftOrder = MATCH_PAIRS.map((p,i)=>i).sort(()=>Math.random()-0.5);
+  matchRightOrder = MATCH_PAIRS.map((p,i)=>i).sort(()=>Math.random()-0.5);
+  const leftCol = document.getElementById('match-left');
+  const rightCol = document.getElementById('match-right');
+  leftCol.innerHTML = ''; rightCol.innerHTML = '';
+  matchLeftOrder.forEach(idx=>{
+    const d = document.createElement('div');
+    d.className = 'match-item'; d.dataset.idx = idx; d.id = 'ml-'+idx;
+    d.textContent = MATCH_PAIRS[idx].left;
+    d.onclick = ()=>clickMatchLeft(idx);
+    leftCol.appendChild(d);
+  });
+  matchRightOrder.forEach(idx=>{
+    const d = document.createElement('div');
+    d.className = 'match-item'; d.dataset.idx = idx; d.id = 'mr-'+idx;
+    d.textContent = MATCH_PAIRS[idx].right;
+    d.onclick = ()=>clickMatchRight(idx);
+    rightCol.appendChild(d);
+  });
+  document.getElementById('match-svg').innerHTML = '';
+}
+function clickMatchLeft(idx){
+  if(document.getElementById('ml-'+idx).classList.contains('done')) return;
+  sfxClick();
+  document.querySelectorAll('#match-left .match-item').forEach(e=>e.classList.remove('sel'));
+  document.getElementById('ml-'+idx).classList.add('sel');
+  matchState.leftSel = idx;
+}
+function clickMatchRight(idx){
+  if(matchState.leftSel === null) return;
+  if(document.getElementById('mr-'+idx).classList.contains('done')) return;
+  sfxClick();
+  const li = matchState.leftSel;
+  const leftEl = document.getElementById('ml-'+li);
+  const rightEl = document.getElementById('mr-'+idx);
+  if(li === idx){
+    leftEl.classList.remove('sel'); leftEl.classList.add('done');
+    rightEl.classList.add('done');
+    drawMatchLine(leftEl, rightEl, true);
+    matchState.pairs[li] = true;
+    matchState.doneCount++;
+    sfxCorrect();
+  } else {
+    drawMatchLine(leftEl, rightEl, false, ()=>{ leftEl.classList.remove('sel'); });
+    sfxWrong();
+  }
+  matchState.leftSel = null;
+}
+function drawMatchLine(elA, elB, correct, cb){
+  const svg = document.getElementById('match-svg');
+  const wrapRect = svg.getBoundingClientRect();
+  const a = elA.getBoundingClientRect(), b = elB.getBoundingClientRect();
+  const x1 = a.right - wrapRect.left, y1 = a.top + a.height/2 - wrapRect.top;
+  const x2 = b.left - wrapRect.left, y2 = b.top + b.height/2 - wrapRect.top;
+  const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+  line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+  line.setAttribute('stroke', correct ? '#1f7a3d' : '#d84848');
+  line.setAttribute('stroke-width','4');
+  line.setAttribute('stroke-linecap','round');
+  if(!correct){ line.setAttribute('stroke-dasharray','6 4'); }
+  svg.appendChild(line);
+  if(!correct){ setTimeout(()=>{ line.remove(); if(cb) cb(); }, 700); }
+}
+
+/* ============ EVALUASI: BABAK C ============ */
+function buildRoundC(){
+  const el = document.getElementById('round-C');
+  el.innerHTML = '';
+  QUIZ_C.forEach((item,qi)=>{
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.innerHTML = `<div class="q-text">${qi+1}. ${item.s}</div>
+      <div class="tf-row">
+        <button class="tf-btn benar" id="tf-benar-${qi}" onclick="answerC(${qi},true,this)">✓ BENAR</button>
+        <button class="tf-btn salah" id="tf-salah-${qi}" onclick="answerC(${qi},false,this)">✗ SALAH</button>
+      </div>`;
+    el.appendChild(card);
+  });
+}
+function answerC(qi,val,btn){
+  if(quizCAnswered[qi] !== null) return;
+  sfxClick();
+  quizCAnswered[qi] = val;
+  const correct = QUIZ_C[qi].val;
+  if(val === correct){ btn.style.outline='4px solid #0d4d24'; sfxCorrect(); }
+  else{ btn.style.outline='4px solid #7a0d0d'; sfxWrong();
+    const rightId = correct ? 'tf-benar-'+qi : 'tf-salah-'+qi;
+    document.getElementById(rightId).style.outline='4px solid #0d4d24';
+  }
+}
+
+/* ============ EVALUASI: NAV ROUND & SCORE ============ */
+const ROUNDS = ['A','B','C','D'];
+let curRound = 0;
+function showRound(i){
+  curRound = i;
+  document.querySelectorAll('.eval-round').forEach(r=>r.classList.remove('active'));
+  document.querySelectorAll('.eval-tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('round-'+ROUNDS[i]).classList.add('active');
+  document.getElementById('tab-'+ROUNDS[i]).classList.add('on');
+  document.getElementById('btn-prev-round').disabled = (i===0);
+  document.getElementById('btn-next-round').textContent = (i===3) ? '🔁 Lihat Skor' : 'Berikutnya ➡️';
+  if(i===3){ computeScore(); }
+}
+function shiftRound(dir){
+  sfxClick();
+  let ni = curRound + dir;
+  if(ni < 0) ni = 0;
+  if(ni > 3) ni = 3;
+  showRound(ni);
+}
+function computeScore(){
+  let scoreA = 0;
+  QUIZ_A.forEach((it,i)=>{ if(quizAAnswered[i] === it.correct) scoreA += 10; });
+  let scoreB = matchState.doneCount * 10;
+  let scoreC = 0;
+  QUIZ_C.forEach((it,i)=>{ if(quizCAnswered[i] === it.val) scoreC += 10; });
+  document.getElementById('score-a').textContent = scoreA;
+  document.getElementById('score-b').textContent = scoreB;
+  document.getElementById('score-c').textContent = scoreC;
+  document.getElementById('final-score').textContent = scoreA+scoreB+scoreC;
+}
+function resetEval(){
+  sfxClick();
+  quizAAnswered = [null,null,null];
+  quizCAnswered = [null,null,null];
+  buildRoundA(); buildRoundB(); buildRoundC();
+  showRound(0);
+}
+
+/* ============ INIT ============ */
+window.addEventListener('DOMContentLoaded', ()=>{
+  buildDhamirSVG();
+  buildRoundA();
+  buildRoundB();
+  buildRoundC();
+  showRound(0);
+});
+</script>
+</body>
+</html>
